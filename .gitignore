@@ -1,5 +1,5 @@
 # file extensions
-.*.swp
+.*.sw[po]
 *~
 *.E
 *.o
