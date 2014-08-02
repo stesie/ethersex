@@ -128,11 +128,21 @@
 #define W5100_SOCK_SR_ARP           0x11 /* or 0x21 or 0x22 */
 
 
+#define w5100_sock_write_txfsr(sock, value) w5100_sock_write_uint16(sock, 0x20, value)
+#define w5100_sock_read_txfsr(sock)         w5100_sock_read_uint16(sock, 0x20)
+
+#define w5100_sock_write_txrd(sock, value)  w5100_sock_write_uint16(sock, 0x22, value)
+#define w5100_sock_read_txrd(sock)          w5100_sock_read_uint16(sock, 0x22)
+
+#define w5100_sock_write_txwr(sock, value)  w5100_sock_write_uint16(sock, 0x24, value)
+#define w5100_sock_read_txwr(sock)          w5100_sock_read_uint16(sock, 0x24)
+
 #define w5100_sock_write_rxrsr(sock, value) w5100_sock_write_uint16(sock, 0x26, value)
 #define w5100_sock_read_rxrsr(sock)         w5100_sock_read_uint16(sock, 0x26)
 
 #define w5100_sock_write_rxrd(sock, value)  w5100_sock_write_uint16(sock, 0x28, value)
 #define w5100_sock_read_rxrd(sock)          w5100_sock_read_uint16(sock, 0x28)
+
 
 
 #define gS0_RX_BASE                 0x6000
@@ -232,6 +242,15 @@ w5100_process(void)
     debug_printf("w5100: s0ir=0x%02x\n", sock_ir);
 #endif
 
+    if(sock_ir & _BV(W5100_SOCK_IR_SEND_OK))
+    {
+#ifdef DEBUG_W5100
+      debug_printf("w5100: packet send ok.\n");
+#endif
+
+      w5100_sock_write_ir(0, _BV(W5100_SOCK_IR_SEND_OK));
+    }
+
     if(sock_ir & _BV(W5100_SOCK_IR_RECV))
     {
 #ifdef DEBUG_W5100
@@ -287,7 +306,42 @@ w5100_process(void)
 void
 w5100_txstart(void)
 {
+#ifdef DEBUG_W5100
   debug_printf("w5100: txstart.\n");
+#endif
+
+  if(uip_len > gS0_TX_MASK)
+  {
+#ifdef DEBUG_W5100
+    debug_printf("w5100: packet too large.\n");
+#endif
+    return;
+  }
+
+  uint16_t free_size;
+  do
+  {
+    free_size = w5100_sock_read_txfsr(0);
+  } while(free_size < uip_len);
+
+  uint16_t txwr = w5100_sock_read_txwr(0);
+  uint16_t address = gS0_TX_BASE + (txwr & gS0_TX_MASK);
+
+  uint8_t *ptr = uip_buf;
+  for(uint16_t i = 0; i < uip_len; i ++)
+  {
+    w5100_write_uint8(address, *ptr);
+    ptr ++;
+
+    if(address == gS0_TX_BASE + gS0_TX_MASK)
+      address = gS0_TX_BASE;
+    else
+      address ++;
+  }
+
+  txwr += uip_len;
+  w5100_sock_write_txwr(0, txwr);
+  w5100_sock_write_cr(0, W5100_SOCK_CR_SEND);
 }
 
 /*
