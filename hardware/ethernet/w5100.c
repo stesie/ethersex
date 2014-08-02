@@ -25,6 +25,7 @@
 #include "core/debug.h"
 #include "core/spi.h"
 #include "hardware/ethernet/w5100.h"
+#include "protocols/uip/uip_router.h"
 
 #define cs_low()  PIN_CLEAR(SPI_CS_W5100)
 #define cs_high() PIN_SET(SPI_CS_W5100)
@@ -73,6 +74,9 @@
  */
 #define w5100_sock_write_uint8(sock, addr, value)   w5100_write_uint8(0x0400 + (0x0100 * sock) + addr, value)
 #define w5100_sock_read_uint8(sock, addr)           w5100_read_uint8(0x0400 + (0x0100 * sock) + addr)
+
+#define w5100_sock_write_uint16(sock, addr, value)  w5100_write_uint16(0x0400 + (0x0100 * sock) + addr, value)
+#define w5100_sock_read_uint16(sock, addr)          w5100_read_uint16(0x0400 + (0x0100 * sock) + addr)
 
 /* mode register */
 #define w5100_sock_write_mr(sock, value)    w5100_sock_write_uint8(sock, 0x00, value)
@@ -124,6 +128,19 @@
 #define W5100_SOCK_SR_ARP           0x11 /* or 0x21 or 0x22 */
 
 
+#define w5100_sock_write_rxrsr(sock, value) w5100_sock_write_uint16(sock, 0x26, value)
+#define w5100_sock_read_rxrsr(sock)         w5100_sock_read_uint16(sock, 0x26)
+
+#define w5100_sock_write_rxrd(sock, value)  w5100_sock_write_uint16(sock, 0x28, value)
+#define w5100_sock_read_rxrd(sock)          w5100_sock_read_uint16(sock, 0x28)
+
+
+#define gS0_RX_BASE                 0x6000
+#define gS0_RX_MASK                 0x07FF
+
+#define gS0_TX_BASE                 0x4000
+#define gS0_TX_MASK                 0x07FF
+
 static inline void
 w5100_write_uint8(uint16_t address, uint8_t value)
 {
@@ -149,6 +166,21 @@ w5100_read_uint8(uint16_t address)
 
   cs_high();
   return value;
+}
+
+static void
+w5100_write_uint16(uint16_t address, uint16_t value)
+{
+  w5100_write_uint8(address, value >> 8);
+  w5100_write_uint8(address + 1, value & 0xFF);
+}
+
+static uint16_t
+w5100_read_uint16(uint16_t address)
+{
+  uint16_t res = w5100_read_uint8(address);
+  res = (res << 8) + w5100_read_uint8(address + 1);
+  return res;
 }
 
 void
@@ -185,6 +217,10 @@ void
 w5100_process(void)
 {
   uint8_t ir = w5100_read_ir();
+
+  if(!ir)
+    return;
+
   debug_printf("w5100: ir=0x%02x\n", ir);
 
   if(ir & _BV(W5100_IR_S0_INT))
@@ -199,21 +235,59 @@ w5100_process(void)
     if(sock_ir & _BV(W5100_SOCK_IR_RECV))
     {
 #ifdef DEBUG_W5100
-      debug_printf("w5100: got packed.\n");
+      debug_printf("w5100: got packet.\n");
 #endif
-    }
 
-    /* clear all interrupts */
-    w5100_sock_write_ir(0, sock_ir);
+      uint16_t size = w5100_sock_read_rxrsr(0) - 2;
+
+#ifdef DEBUG_W5100
+      debug_printf("w5100: received %d bytes.\n", size);
+#endif
+
+      uint16_t rxrd = w5100_sock_read_rxrd(0) + 2;
+
+      if(size < UIP_BUFSIZE)
+      {
+        /* calculate start address(physical address) */
+        uint16_t address = gS0_RX_BASE + (rxrd & gS0_RX_MASK);
+
+        uint8_t *ptr = uip_buf;
+        for(uint16_t i = 0; i < size; i ++)
+        {
+          uint8_t byte = w5100_read_uint8(address);
+          *ptr = byte;
+
+          ptr ++;
+
+          if(address == gS0_RX_BASE + gS0_RX_MASK)
+            address = gS0_RX_BASE;
+          else
+            address ++;
+        }
+      }
+
+      w5100_sock_write_rxrd(0, rxrd + size);
+      w5100_sock_write_cr(0, W5100_SOCK_CR_RECV);
+      w5100_sock_write_ir(0, _BV(W5100_SOCK_IR_RECV));
+
+      if(size < UIP_BUFSIZE)
+      {
+        uip_len = size;
+        ethernet_process_packet();
+      }
+    }
   }
 
   if(ir)
+  {
     w5100_write_ir(ir);
+  }
 }
 
 void
 w5100_txstart(void)
 {
+  debug_printf("w5100: txstart.\n");
 }
 
 /*

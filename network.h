@@ -42,6 +42,8 @@ void network_process(void);
 void network_config_load(void);
 
 #ifdef ETHERNET_SUPPORT
+void ethernet_process_packet(void);
+
 static inline uint8_t ethernet_txstart(void)
 {
   uint8_t retval;

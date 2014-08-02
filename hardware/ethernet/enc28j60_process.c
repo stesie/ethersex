@@ -209,78 +209,7 @@ void process_packet(void)
         *p++ = read_buffer_memory();
 
     uip_len = rpv.received_packet_size;
-
-    /* Set the enc stack active */
-    uip_stack_set_active(STACK_ENC);
-
-    /* process packet */
-    struct uip_eth_hdr *packet = (struct uip_eth_hdr *)&uip_buf;
-
-#ifdef IEEE8021Q_SUPPORT
-    /* Check VLAN tag. */
-    if (packet->tpid != HTONS(0x8100)
-	|| (packet->vid_hi & 0x1F) != (CONF_8021Q_VID >> 8)
-	|| packet->vid_lo != (CONF_8021Q_VID & 0xFF)) {
-	debug_printf("net: wrong vlan tag detected.\n");
-    }
-    else
-#endif
-    {
-    switch (HTONS(packet->type)) {
-
-#       if !UIP_CONF_IPV6
-        /* process arp packet */
-        case UIP_ETHTYPE_ARP:
-#           ifdef DEBUG_NET
-            debug_printf("net: arp packet received\n");
-#           endif
-            uip_arp_arpin();
-
-            /* if there is a packet to send, send it now */
-            if (uip_len > 0)
-                transmit_packet();
-
-            break;
-#       endif /* !UIP_CONF_IPV6 */
-
-#       if UIP_CONF_IPV6
-        /* process ip packet */
-        case UIP_ETHTYPE_IP6:
-#           ifdef DEBUG_NET
-            debug_printf ("net: ip6 packet received\n");
-#           endif
-#       else /* !UIP_CONF_IPV6 */
-        /* process ip packet */
-        case UIP_ETHTYPE_IP:
-#           ifdef DEBUG_NET
-            debug_printf ("net: ip packet received\n");
-#           endif
-            uip_arp_ipin();
-#       endif /* !UIP_CONF_IPV6 */
-
-            router_input(STACK_ENC);
-
-	    /* if there is a packet to send, send it now */
-	    if (uip_len > 0)
-		router_output();
-
-            break;
-#ifdef DEBUG_UNKNOWN_PACKETS
-      default:
-      	/* debug output */
-        debug_printf("net: unknown packet, %02x%02x%02x%02x%02x%02x "
-                     "-> %02x%02x%02x%02x%02x%02x, type 0x%04x\n",
-                     packet->src.addr[0], packet->src.addr[1],
-                     packet->src.addr[2], packet->src.addr[3],
-                     packet->src.addr[4], packet->src.addr[5],
-                     packet->dest.addr[0], packet->dest.addr[1],
-                     packet->dest.addr[2], packet->dest.addr[3],
-                     packet->dest.addr[4], packet->dest.addr[5],
-                     ntohs(packet->type));
-            break;
-#       endif
-    }
-    }
+    ethernet_process_packet()
 
     /* advance receive read pointer, ensuring that an odd value is programmed
      * (next_receive_packet_pointer is always even), see errata #13 */
