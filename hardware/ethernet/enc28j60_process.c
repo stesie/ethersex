@@ -209,7 +209,7 @@ void process_packet(void)
         *p++ = read_buffer_memory();
 
     uip_len = rpv.received_packet_size;
-    ethernet_process_packet()
+    ethernet_process_packet();
 
     /* advance receive read pointer, ensuring that an odd value is programmed
      * (next_receive_packet_pointer is always even), see errata #13 */
