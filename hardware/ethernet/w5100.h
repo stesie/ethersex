@@ -23,6 +23,7 @@
 #define HAVE_W5100_H
 
 void w5100_init(void);
+void w5100_process(void);
 void w5100_txstart(void);
 
 #endif  /* HAVE_W5100_H */
