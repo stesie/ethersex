@@ -92,7 +92,7 @@
 /* Map the IP address configuration to use in network.c
    (and that is assigned to the primary stack). */
 
-#ifdef ENC28J60_SUPPORT
+#if defined (ENC28J60_SUPPORT) || defined (W5100_SUPPORT)
 #  define set_CONF_ETHERSEX_MAC(ip)		set_CONF_ENC_MAC(ip)
 #  define set_CONF_ETHERSEX_IP(ip)		set_CONF_ENC_IP(ip)
 #  define set_CONF_ETHERSEX_IP4_NETMASK(ip)	set_CONF_ENC_IP4_NETMASK(ip)

@@ -118,7 +118,7 @@ mainmenu_option next_comment
 	string "Hostname" CONF_HOSTNAME "ethersex"
 
 
-#	if [ "$ENC28J60_SUPPORT" = "y" -o "$RFM12_IP_SUPPORT" = "y" -o "$ZBUS_SUPPORT" = "y" -o "$UIP_SUPPORT" = "y" -o "$UDP_SUPPORT" = "y" -o "$TCP_SUPPORT" = "y" -o "$ICMP_SUPPORT" = "y" ]; then
+#	if [ "$ENC28J60_SUPPORT" = "y" -o "$W5100_SUPPORT" = "y" -o "$RFM12_IP_SUPPORT" = "y" -o "$ZBUS_SUPPORT" = "y" -o "$UIP_SUPPORT" = "y" -o "$UDP_SUPPORT" = "y" -o "$TCP_SUPPORT" = "y" -o "$ICMP_SUPPORT" = "y" ]; then
 		if [ "$NET_MAX_FRAME_LENGTH" = "" ] ; then NET_MAX_FRAME_LENGTH=1500 ; fi
 		if [ "$NET_MAX_FRAME_LENGTH" -lt 64 -o "$NET_MAX_FRAME_LENGTH" -gt 1500 ] ; then NET_MAX_FRAME_LENGTH=1500 ; fi
 
@@ -179,14 +179,14 @@ mainmenu_option next_comment
 	if [ "$DHCP_SUPPORT" = "y" ]; then
 		dep_bool 'BOOTP (DHCP-like) support' BOOTP_SUPPORT "n"
 	else
-		dep_bool 'BOOTP (DHCP-like) support' BOOTP_SUPPORT $BROADCAST_SUPPORT $ENC28J60_SUPPORT $IPV4_SUPPORT
+		dep_bool 'BOOTP (DHCP-like) support' BOOTP_SUPPORT $BROADCAST_SUPPORT $ETHERNET_SUPPORT $IPV4_SUPPORT
 	fi
 	dep_bool 'Write BOOTP data to EEPROM' BOOTP_TO_EEPROM_SUPPORT $BOOTLOADER_SUPPORT $BOOTP_SUPPORT
 
 	if [ "$BOOTP_SUPPORT" = "y" ]; then
 		dep_bool "DHCP support" DHCP_SUPPORT "n"
 	else
-		dep_bool "DHCP support" DHCP_SUPPORT $BROADCAST_SUPPORT $ENC28J60_SUPPORT $IPV4_SUPPORT
+		dep_bool "DHCP support" DHCP_SUPPORT $BROADCAST_SUPPORT $ETHERNET_SUPPORT $IPV4_SUPPORT
 	fi
 
 	comment "Tunneling protocols"

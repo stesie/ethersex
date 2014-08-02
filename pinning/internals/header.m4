@@ -343,6 +343,7 @@ define(`S1D13305_DATA_PORT', `dnl
 ifdef(`conf_SOFT_SPI', `', `dnl
   ifdef(`conf_RFM12', `define(need_spi, 1)')dnl
   ifdef(`conf_ENC28J60', `define(need_spi, 1)')dnl
+  ifdef(`conf_W5100', `define(need_spi, 1)')dnl
   ifdef(`conf_DATAFLASH', `define(need_spi, 1)')dnl
   ifdef(`conf_SD_READER', `define(need_spi, 1)')dnl
   ifdef(`conf_USTREAM', `define(need_spi, 1)')dnl
