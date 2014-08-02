@@ -24,6 +24,7 @@ MCradiolists
 meta.c
 meta.h
 meta.m4
+meta.defines
 pinning.c
 scripts/lxdialog/lxdialog
 .menuconfig.log
