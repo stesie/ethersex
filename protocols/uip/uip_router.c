@@ -198,12 +198,12 @@ router_output_to (uint8_t dest)
   switch (dest)
     {
 
-#ifdef ENC28J60_SUPPORT
+#if defined(ENC28J60_SUPPORT) || defined(W5100_SUPPORT)
     case STACK_ENC:
-      printf ("router_output_to: ENC28J60.\n");
-      enc28j60_txstart ();
+      printf ("router_output_to: Ethernet.\n");
+      ethernet_txstart ();
       break;
-#endif	/* ENC28J60_SUPPORT */
+#endif	/* ENC28J60_SUPPORT || W5100_SUPPORT */
 
 
 #ifdef RFM12_IP_SUPPORT

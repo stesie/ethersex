@@ -50,9 +50,9 @@ void router_output(void);
   } while(0)
 
 
-#if defined(ENC28J60_SUPPORT)
+#if defined(ENC28J60_SUPPORT) || defined(W5100_SUPPORT)
 #  include "network.h"
-#  define router_output() enc28j60_txstart()
+#  define router_output() ethernet_txstart()
 
 #elif defined(TAP_SUPPORT)
 #  include "core/host/tap.h"

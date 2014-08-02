@@ -173,7 +173,7 @@ typedef unsigned short uip_stats_t;
 #endif
 
 
-#if defined(ENC28J60_SUPPORT) || defined(TAP_SUPPORT)
+#if defined(ETHERNET_SUPPORT)
 /* On stand-alone ethersex and on rfm12/zbus-bridge always use 14 byte LLH. */
 #  define __LLH_LEN  (14 + VLAN_LLH_EXTRA)
 
@@ -231,7 +231,7 @@ enum {
 #if defined(USB_NET_SUPPORT)
   STACK_USB,
 #endif
-#if defined(ENC28J60_SUPPORT)
+#if defined(ENC28J60_SUPPORT) || defined(W5100_SUPPORT)
   STACK_ENC,
 #endif
 #if defined(TAP_SUPPORT)

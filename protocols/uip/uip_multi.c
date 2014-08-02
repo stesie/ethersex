@@ -84,7 +84,7 @@ struct uip_stack uip_stacks[STACK_LEN] = {
   STACK_FUNCS (usb_stack),
 #endif
 
-#ifdef ENC28J60_SUPPORT
+#if defined(ENC28J60_SUPPORT) || defined(W5100_SUPPORT)
   STACK_FUNCS (enc_stack),
 #endif
 
@@ -95,7 +95,7 @@ struct uip_stack uip_stacks[STACK_LEN] = {
 
 struct uip_stack *uip_stack = &uip_stacks[0];
 
-#ifdef ENC28J60_SUPPORT
+#if defined(ENC28J60_SUPPORT) || defined(W5100_SUPPORT)
 STACK_DEFINITIONS(enc_stack);
 #endif
 

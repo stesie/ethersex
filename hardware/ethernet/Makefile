@@ -12,6 +12,9 @@ $(ENC28J60_SUPPORT)_SRC += \
 	hardware/ethernet/enc28j60_process.c	\
 	hardware/ethernet/enc28j60_transmit.c
 
+$(W5100_SUPPORT)_SRC += \
+	hardware/ethernet/w5100.c
+
 ##############################################################################
 # generic fluff
 include $(TOPDIR)/scripts/rules.mk

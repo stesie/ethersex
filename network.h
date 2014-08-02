@@ -24,6 +24,7 @@
 #define _NETWORK_H
 
 #include "hardware/ethernet/enc28j60.h"
+#include "hardware/ethernet/w5100.h"
 #include "config.h"
 
 #include "protocols/uip/uip.h"
@@ -38,11 +39,10 @@ void network_init(void);
 /* check for ethernet controller interrupts */
 void network_process(void);
 
-#ifdef ENC28J60_SUPPORT
-/* send a packet placed in the global buffer */
-void transmit_packet(void);
+void network_config_load(void);
 
-static inline uint8_t enc28j60_txstart(void)
+#ifdef ETHERNET_SUPPORT
+static inline uint8_t ethernet_txstart(void)
 {
   uint8_t retval;
 
@@ -52,10 +52,15 @@ static inline uint8_t enc28j60_txstart(void)
 #else
   retval = uip_arp_out();
 #endif
+
+#ifdef ENC28J60_SUPPORT
   transmit_packet();
+#else
+  w5100_txstart();
+#endif
 
   return retval;
 }
-#endif
+#endif  /* ETHERNET_SUPPORT */
 
 #endif /* _NETWORK_H */
