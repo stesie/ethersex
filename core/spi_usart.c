@@ -29,14 +29,16 @@
 #define BAUD 9600 /* Dummy */
 #include "core/usart.h"
 
-#if defined(RFM12_SUPPORT) || defined(ENC28J60_SUPPORT) \
-  || defined(DATAFLASH_SUPPORT) || defined(SD_READER_SUPPORT)
+#if defined(RFM12_SUPPORT)      \
+  || defined(ENC28J60_SUPPORT)  \
+  || defined(W5100_SUPPORT)     \
+  || defined(DATAFLASH_SUPPORT) \
+  || defined(SD_READER_SUPPORT)
 
 static void spi_wait_busy(void);
 
 void spi_init(void)
 {
-
     usart(UBRR) = 0;
 
   /* Set the chipselects as high */
@@ -47,6 +49,11 @@ void spi_init(void)
 #ifdef ENC28J60_SUPPORT
     DDR_CONFIG_OUT(SPI_CS_NET);
     PIN_SET(SPI_CS_NET);
+#endif
+
+#ifdef W5100_SUPPORT
+    DDR_CONFIG_OUT(SPI_CS_W5100);
+    PIN_SET(SPI_CS_W5100);
 #endif
 
 #ifdef RFM12_SUPPORT
@@ -98,4 +105,4 @@ uint8_t noinline spi_send(uint8_t data)
 }
 
 #endif /* DATAFLASH_SUPPORT || ENC28J60_SUPPORT || RFM12_SUPPORT 
-    || SD_READER_SUPPORT */
+    || SD_READER_SUPPORT || W5100_SUPPORT */

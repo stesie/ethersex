@@ -179,7 +179,7 @@ main (void)
 #endif //USE_WATCHDOG
 
 #if defined(RFM12_SUPPORT) || defined(ENC28J60_SUPPORT) \
-	|| defined(DATAFLASH_SUPPORT)
+	|| defined(DATAFLASH_SUPPORT) || defined(W5100_SUPPORT)
   spi_init();
 #endif
 

@@ -27,6 +27,7 @@
 #include "hardware/radio/rfm12/rfm12.h"
 
 #if defined(ENC28J60_SUPPORT)       || \
+    defined(W5100_SUPPORT)          || \
     defined(SER_RAM_23K256_SUPPORT) || \
     defined(RFM12_SUPPORT)          || \
     defined(DATAFLASH_SUPPORT)      || \
@@ -45,6 +46,10 @@ spi_init(void)
 
 #ifdef ENC28J60_SUPPORT
   PIN_SET(SPI_CS_NET);
+#endif
+
+#ifdef W5100_SUPPORT
+  PIN_SET(SPI_CS_W5100);
 #endif
 
 #ifdef SER_RAM_23K256_SUPPORT
