@@ -231,15 +231,15 @@ w5100_process(void)
   if(!ir)
     return;
 
+#ifdef DEBUG_W5100
   debug_printf("w5100: ir=0x%02x\n", ir);
+#endif
 
   if(ir & _BV(W5100_IR_S0_INT))
   {
-#ifdef DEBUG_W5100
-    debug_printf("w5100: got interrupt on socket 0.\n");
-
     uint8_t sock_ir = w5100_sock_read_ir(0);
-    debug_printf("w5100: s0ir=0x%02x\n", sock_ir);
+#ifdef DEBUG_W5100
+    debug_printf("w5100: got interrupt on socket 0; s0ir=0x%02x\n", sock_ir);
 #endif
 
     if(sock_ir & _BV(W5100_SOCK_IR_SEND_OK))
