@@ -1079,6 +1079,7 @@ Select the default profile you wish to load. \
 			fimser		  "Fieldday Instant Messenger"			0 \
 			probot		  "Conrad Probot"				0 \
 			arduino_duemilanove "Arduino Duemilanove"			0 \
+			arduino_uno   "Arduino Uno w/ Ethernet Shield" 0 \
 			rfm12-teensy	  "RFM12 Standalone"				0 \
 			zbus-teensy	  "ZBUS Standalone"				0 \
 			usb-teensy	  "USB (Network) Standalone"			0 \
